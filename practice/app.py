@@ -31,9 +31,8 @@ def api_recommend_article():
 def api_mental_article():
     with urlopen("https://news.yahoo.co.jp/") as res:
         html = res.read().decode("utf-8")
-    # 2. BeautifulSoupでHTMLを読み込む
         soup = BeautifulSoup(html, "html.parser")
-    # 3. 記事一覧を取得する
+
         topics = soup.select(".sc-ksYbfQ .sc-hmzhuo")
         shuffle(topics)
         topic = topics[0]
