@@ -60,10 +60,13 @@ function handleStartButtonClick() {
         return;
       }
 
-      if (text.indexOf('ニュース') !== -1) {
-        // ニュースだったら、API経由でおすすめ記事を取得する.
+      if (text.indexOf('はてな') !== -1) {
+        // ニュースだったら、API経由（はてな）でおすすめ記事を取得する.
         showRecommendArticle();
       
+      } else if (text.indexOf('Yahoo')!== -1) {
+        //Yahoo!だったら、API経由（yahooニュース）でおすすめ記事を取得する。
+        showMentalArticle(); 
       } else {
         // ニュース以外はわからないよ〜.
         let synthes = new SpeechSynthesisUtterance('ごめんなさい、ニュース以外はわかりません');
@@ -106,6 +109,19 @@ function showRecommendArticle() {
     });
 }
 
+function showMentalArticle() {
+    api('/api/mental_article').then(response => {
+        let { content, link } = JSON.parse(response);
+        console.log(content);
+
+        let synthes = new SpeechSynthesisUtterance(content);
+        synthes.lang = "ja-JP";
+        speechSynthesis.speak(synthes);
+
+        document.getElementById('text').innerHTML = `<a href="${link}">${content}</a>`;
+    });
+}
+
 /**
  * アプリ起動時に、説明を表示します.
  */
@@ -116,7 +132,7 @@ function startIntro() {
     return new Promise((resolve, reject) => {
 
         // let texts = "「おすすめニュースを教えて」と聞いてみてください。".split('');
-        let texts = "「おすすめニュースを教えて」と聞いてみてください。".split('');
+        let texts = "「はてな」か「Yahoo!のニュースを教えて」と聞いてみてください。".split('');
 
         function showMessage(texts, cb) {
             if (texts.length === 0) {

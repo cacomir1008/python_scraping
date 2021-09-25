@@ -8,41 +8,44 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    """初期画面を表示します."""
+    # """初期画面を表示します."""
     return render_template("index.html")
 
 @app.route("/api/recommend_article")
 def api_recommend_article():
-    """はてブのホットエントリーから記事を入手して、ランダムに1件返却します."""
+    with urlopen("http://feeds.feedburner.com/hatena/b/hotentry") as res:
+        html = res.read().decode("utf-8")
+        soup = BeautifulSoup(html, "html.parser")
 
-    """
-        **** ここを実装します（基礎課題） ****
+        items = soup.select("item")
+        shuffle(items)
+        item = items[0]
+        print(item)
 
-        1. はてブのホットエントリーページのHTMLを取得する
-        2. BeautifulSoupでHTMLを読み込む
-        3. 記事一覧を取得する
-        4. ランダムに1件取得する
-        5. 以下の形式で返却する.
-            {
-                "content" : "記事のタイトル",
-                "link" : "記事のURL"
-            }
-    """
-
-    # ダミー
     return json.dumps({
-        "content" : "記事のタイトルだよー",
-        "link" : "記事のURLだよー"
+        "content" : item.find("title").string,
+        "link" : item.get('rdf:about')
     })
 
-@app.route("/api/xxxx")
-def api_xxxx():
-    """
-        **** ここを実装します（発展課題） ****
-        ・自分の好きなサイトをWebスクレイピングして情報をフロントに返却します
-        ・お天気APIなども良いかも
-        ・関数名は適宜変更してください
-    """
+@app.route("/api/mental_article")
+def api_mental_article():
+    with urlopen("https://news.yahoo.co.jp/") as res:
+        html = res.read().decode("utf-8")
+    # 2. BeautifulSoupでHTMLを読み込む
+        soup = BeautifulSoup(html, "html.parser")
+    # 3. 記事一覧を取得する
+        topics = soup.select(".sc-ksYbfQ .sc-hmzhuo")
+        shuffle(topics)
+        topic = topics[0]
+        print(topic)
+
+    
+    return json.dumps({
+        # "content" : topic.find(".sc-hmzhuo"),
+        "content" : topic.string,
+        "link" : topic.get('href')
+    })
+
     pass
 
 if __name__ == "__main__":
