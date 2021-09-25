@@ -40,7 +40,6 @@ def api_mental_article():
 
     
     return json.dumps({
-        # "content" : topic.find(".sc-hmzhuo"),
         "content" : topic.string,
         "link" : topic.get('href')
     })
